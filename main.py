@@ -7,7 +7,7 @@ import random
 
 SIZE = 40
 BACKGROUND_COLOR = (255,0,0)
-TEXT_COLOR = (200,200,200)
+TEXT_COLOR = (255,255,255)
 class Apple:
     def __init__(self, parent_screen):
         self.parent_screen = parent_screen
@@ -67,7 +67,7 @@ class Snake:
 
 
     def draw(self):
-        self.parent_screen.fill(BACKGROUND_COLOR)
+        #self.parent_screen.fill(BACKGROUND_COLOR)
 
         for i in range(self.length):
             self.parent_screen.blit(self.image, (self.x[i], self.y[i]))
@@ -83,11 +83,25 @@ class Snake:
 class Game:
     def __init__(self):
         pygame.init()
+        pygame.display.set_caption("SNAKE GAME")
+
+        pygame.mixer.init()
+        self.play_background_music()
+
         self.surface = pygame.display.set_mode((1000,800))
         self.snake = Snake(self.surface)
         self.snake.draw()
         self.apple = Apple(self.surface)
         self.apple.draw()
+    
+    def play_background_music(self):
+        pass
+    
+    def play_sound(self, sound_name):
+        if sound_name == 'ding':
+            sound = pygame.mixer.Sound('resource/Ding-sound-effect.mp3')
+        
+        pygame.mixer.Sound.play(sound)
 
     def is_collision(self, x1,y1, x2, y2):
         if x1 >= x2 and x1 < x2 + SIZE:
@@ -95,7 +109,11 @@ class Game:
                 return True
             
         return False
-
+    
+    def render_background(self):
+        bg_image = pygame.image.load("resource/bg.jpg")
+        self.surface.blit(bg_image, (0,0))
+        pygame.display.flip()
     
     def display_score(self):
         font = pygame.font.SysFont('arial', 30)
@@ -113,6 +131,7 @@ class Game:
         pygame.display.flip() # refresh the UI
 
     def play(self):
+        self.render_background()
         self.snake.walk()
         self.apple.draw()
         self.display_score()
@@ -120,6 +139,7 @@ class Game:
 
         #snake eating apple
         if self.is_collision(self.snake.x[0], self.snake.y[0], self.apple.x, self.apple.y):
+            self.play_sound("ding")
             self.snake.increase_length()
             self.apple.move()
 
